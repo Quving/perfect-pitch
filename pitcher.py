@@ -11,29 +11,32 @@ class Difficulty(Enum):
 
 
 class Pitcher():
-
     def __init__(self):
-        audiofile_path = 'audiofiles'
-        filenames = next(walk(audiofile_path), (None, None, []))[2]
+        audiofiles_path = 'audiofiles'
+        filenames = next(walk(audiofiles_path), (None, None, []))[2]
         filenames = list(filter(lambda c: c.endswith('mp3'), filenames))
         filenames.sort()
 
-        self.audiofiles = [os.path.join(audiofile_path, filename) for filename in filenames]
+        self.audio_files = [os.path.join(audiofiles_path, filename) for filename in filenames]
 
-    def get_index_of_tone(self, key):
-        for f in self.audiofiles:
+        self.tones = {}
+        self.order = []
+        for f in self.audio_files:
             tone = f.split('_')[1].split('.')[0]
-            if tone == key:
-                return self.audiofiles.index(f)
+            self.tones[tone] = f
+            self.order.append(tone)
+
+    def get_index_of_tone(self, tone):
+        return self.order.index(tone)
 
     def get_similar_tones(self, tone: str, difficulty: Difficulty):
         index = self.get_index_of_tone(tone)
         if not index:
             print("Wrong tone provided. Try again!")
-            return
+            exit(code=1)
 
         random_indexes = []
         for i in range(5):
             random_indexes.append(random.randint(index - difficulty.value, index + difficulty.value))
 
-        return [self.audiofiles[random_index] for random_index in random_indexes]
+        return [self.tones[self.order[random_index]] for random_index in random_indexes]
