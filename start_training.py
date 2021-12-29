@@ -1,5 +1,4 @@
 import time
-from pprint import pprint
 
 import vlc
 
@@ -35,7 +34,7 @@ class TrainingSessions:
         tone_to_test = self.request_tone()
         similar_tones = self.pitcher.get_similar_tones(tone=tone_to_test.tone, difficulty=Difficulty.MEDIUM)
 
-        self.session[tone_to_test.tone] = {}
+        self.session[tone_to_test.tone] = []
         for tone in similar_tones:
             print("< Tone will be played >")
             time.sleep(1)
@@ -51,14 +50,9 @@ class TrainingSessions:
                 feedback = self.request_feedback()
 
             difference = tone.index - tone_to_test.index
-            result = 'false'
-
-            if feedback == "1" and difference < 0:
-                result = 'true'
-            elif feedback == "2" and difference == 0:
-                result = 'true'
-            elif feedback == "3" and difference > 0:
-                result = 'true'
+            result = feedback == "1" and difference < 0 or \
+                     feedback == "2" and difference == 0 or \
+                     feedback == "3" and difference > 0
 
             feedback_dict = {
                 "1": "too low",
@@ -67,14 +61,18 @@ class TrainingSessions:
             }
             result = {
                 'result': result,
+                'tone': tone.tone,
                 'feedback': feedback_dict[str(feedback)],
                 'difference': difference
             }
 
-            self.session[tone_to_test.tone][tone.tone] = result
+            self.session[tone_to_test.tone].append(result)
         print("Session finished!")
 
-        pprint(self.session)
+        for k, v in self.session.items():
+            print("--- {} ---".format(k))
+            for x in v:
+                print('\t', x['result'], x)
 
 
 if __name__ == '__main__':
