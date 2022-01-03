@@ -5,9 +5,9 @@ from os import walk
 
 
 class Difficulty(Enum):
-    EASY = 10
-    MEDIUM = 6
-    HARD = 3
+    EASY = 7
+    MEDIUM = 4
+    HARD = 2
 
 
 class Tone:
